@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres-petitions
+    restart: always
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: P@55w0rd
+      POSTGRES_DB: petitions
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    command: ["postgres", "-c", "listen_addresses=*"]
