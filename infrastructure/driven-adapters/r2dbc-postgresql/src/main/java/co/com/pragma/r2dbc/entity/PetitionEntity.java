@@ -22,13 +22,13 @@ import java.util.UUID;
 public class PetitionEntity {
     @Id
     private UUID id;
-    @Column("user_dni")
-    private String dni;
+    @Column("user_id")
+    private String userId;
     @Column("loan_amount")
     private BigDecimal loanAmount;
     private String term;
     @Column("loan_type")
     private Loantypes loanType;
     @Column("loan_status")
-    private LoanStatus loanStatus;
+    private LoanStatus loanStatus ;
 }

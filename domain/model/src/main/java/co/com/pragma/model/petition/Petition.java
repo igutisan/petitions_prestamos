@@ -15,7 +15,7 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 public class Petition {
     private UUID id;
-    private String dni;
+    private String userId;
     private BigDecimal loanAmount;
     private String term;
     private Loantypes loanType;

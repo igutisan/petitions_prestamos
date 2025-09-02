@@ -6,9 +6,6 @@ import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 
 public record CreatePetitionDTO(
-        @NotBlank(message = "El DNI no puede estar vacío")
-        @Size(min = 6, max = 15, message = "El DNI debe tener entre 6 y 15 caracteres")
-        String dni,
 
         @NotNull(message = "El monto del préstamo es obligatorio")
         @DecimalMin(value = "500000.00", message = "El monto mínimo permitido es $500,000 COP")

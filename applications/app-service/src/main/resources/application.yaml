@@ -50,6 +50,8 @@ resilience4j:
         slidingWindowSize: 10
         minimumNumberOfCalls: 10
         waitDurationInOpenState: "10s"
+jwt:
+  secret: ${JWT_SECRET:bXlzZWNyZXRrZXlmb3Jqd3RzZWNyZXRrZXltdXN0YmVsb25nZW5vdWdoZm9ySFMyNTZhbGdvcml0aG0=}
 
 
 adapters:

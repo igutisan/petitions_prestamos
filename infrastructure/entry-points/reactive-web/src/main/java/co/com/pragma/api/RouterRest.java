@@ -14,7 +14,9 @@ public class RouterRest {
         return RouterFunctions
             .route()
             .path("/api/v1", builder ->
-                    builder.POST("/petition", handlerV1::listenCreatePetition))
+                    builder.POST("/petition", handlerV1::listenCreatePetition)
+                            .GET("/petition", handlerV1::listenCreatePetition)
+                            .POST("/users", handlerV1::listenCreateUser))
             .build();
         }
 }
