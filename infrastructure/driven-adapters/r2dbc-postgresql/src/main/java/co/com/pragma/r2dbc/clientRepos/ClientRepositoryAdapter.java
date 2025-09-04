@@ -1,4 +1,4 @@
-package co.com.pragma.r2dbc;
+package co.com.pragma.r2dbc.clientRepos;
 
 import co.com.pragma.model.client.Client;
 import co.com.pragma.model.client.gateways.ClientRepository;

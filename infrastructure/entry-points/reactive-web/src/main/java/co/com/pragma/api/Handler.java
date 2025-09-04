@@ -6,6 +6,7 @@ import co.com.pragma.api.exceptions.ValidationException;
 import co.com.pragma.api.mapper.ClientDTOMapper;
 import co.com.pragma.api.mapper.PetitionDTOMapper;
 import co.com.pragma.model.petition.LoanStatus;
+import co.com.pragma.model.petitionwithuserinfo.PetitionWithUserInfo;
 import co.com.pragma.usecase.client.ClientUseCase;
 import co.com.pragma.usecase.petition.PetitionUseCase;
 import lombok.RequiredArgsConstructor;
@@ -81,5 +82,18 @@ public class Handler {
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(savedPetition));
 
+    }
+
+    @PreAuthorize("hasRole('ASESOR')")
+    public Mono<ServerResponse> getAllPetitionsWithUserInfo(ServerRequest request) {
+        String status = request.queryParam("status").orElse("PENDING_REVIEW");
+        int page = Integer.parseInt(request.queryParam("page").orElse("0"));
+        int size = Integer.parseInt(request.queryParam("size").orElse("10"));
+
+        System.out.println("page: " + page + " size: " + size + " status: " + status );
+
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(petitionUseCase.getAllPetitionsWithUserInfo(status, page, size), PetitionWithUserInfo.class);
     }
 }

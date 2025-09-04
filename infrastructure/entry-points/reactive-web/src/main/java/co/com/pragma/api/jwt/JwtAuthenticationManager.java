@@ -1,5 +1,6 @@
 package co.com.pragma.api.jwt;
 
+import co.com.pragma.api.exceptions.TokenException;
 import jdk.jfr.Category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -26,20 +27,19 @@ import java.util.List;
 @Component
 public class JwtAuthenticationManager implements ReactiveAuthenticationManager {
     private final JwtProvider jwtProvider;
- //   private final UserDetailsService userDetailsService;
 
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
         return Mono.just(authentication)
                 .map(auth -> jwtProvider.getClaims(auth.getCredentials().toString()))
-                .onErrorResume(e -> Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token inválido")))
+                .onErrorResume(e -> Mono.error(new TokenException("Invalid token")))
                 .map(claims -> {
-                    String username = claims.getSubject(); // O un claim "username"
-                    List<String> roles = claims.get("roles", List.class);
-                    List<SimpleGrantedAuthority> authorities = convertRolesToAuthorities(roles);
+                    String id = claims.getSubject();
+                    List roles = claims.get("roles", List.class);
+                    List authorities = convertRolesToAuthorities(roles);
 
                     return new UsernamePasswordAuthenticationToken(
-                            username, // Pasamos directamente el username, no el objeto UserDetails
+                            id,
                             null,
                             authorities
                     );

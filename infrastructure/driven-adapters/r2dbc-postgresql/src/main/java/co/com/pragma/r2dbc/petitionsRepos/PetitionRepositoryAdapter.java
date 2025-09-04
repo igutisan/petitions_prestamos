@@ -1,4 +1,4 @@
-package co.com.pragma.r2dbc;
+package co.com.pragma.r2dbc.petitionsRepos;
 
 import co.com.pragma.model.petition.Petition;
 
@@ -7,6 +7,7 @@ import co.com.pragma.r2dbc.entity.PetitionEntity;
 import co.com.pragma.r2dbc.helper.ReactiveAdapterOperations;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
@@ -23,6 +24,11 @@ public class PetitionRepositoryAdapter extends ReactiveAdapterOperations<
     @Override
     public Mono<Petition> save(Petition petition){
         return super.save(petition);
+    }
+
+    @Override
+    public Flux<Petition> findByUserId(String userId) {
+        return null;
     }
 
 }

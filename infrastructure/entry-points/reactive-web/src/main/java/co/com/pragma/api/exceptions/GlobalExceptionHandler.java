@@ -61,6 +61,16 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
             );
         }
 
+        // Manejar TokenException
+        if (error instanceof TokenException) {
+            return buildErrorResponse(
+                    HttpStatus.UNAUTHORIZED,
+                    "INVALID_TOKEN",
+                    error.getMessage(),
+                    request.path()
+            );
+        }
+
 
         // Manejar IllegalArgumentException
         if (error instanceof IllegalArgumentException) {
