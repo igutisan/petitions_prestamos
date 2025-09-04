@@ -12,7 +12,6 @@ public class ClientUseCase {
     private final ClientRepository clientRepository;
 
     public Mono<Void> createClient(Client client) {
-        System.out.println("Sincronizando cliente");
         return  clientRepository.insertUser(client);
     }
 }

@@ -41,9 +41,12 @@ public class Handler {
 
 
     public Mono<ServerResponse> listenCreateUser(ServerRequest serverRequest) {
+        log.info("Received request to create a new client");
         return serverRequest.bodyToMono(CreateClientDTO.class)
                 .map(clientMapper::toModel)
                 .flatMap(clientUseCase::createClient)
+                .doOnSuccess(client -> log.info("Successfully created client"))
+                .doOnError(e -> log.error("Error creating client", e))
                 .as(transactionalOperator::transactional)
                 .flatMap(savedClient -> ServerResponse.status(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -52,21 +55,24 @@ public class Handler {
 
     @PreAuthorize("hasRole('CLIENTE')")
     public Mono<ServerResponse> listenCreatePetition(ServerRequest serverRequest) {
+        log.info("Received request to create a new petition");
         return serverRequest.bodyToMono(CreatePetitionDTO.class)
                 .flatMap(dto -> {
-                    log.info("Validating dto");
+                    log.debug("Validating petition DTO");
                     Errors errors = new BeanPropertyBindingResult(dto, "dto");
-                    validator.validate(dto,errors);
+                    validator.validate(dto, errors);
 
-                    if (errors.hasErrors()){
-                        log.error("Errors found in mapping dto");
+                    if (errors.hasErrors()) {
                         Map<String, String> errorsMap = errors.getFieldErrors().stream()
                                 .collect(java.util.stream.Collectors.toMap(
                                         FieldError::getField,
                                         DefaultMessageSourceResolvable::getDefaultMessage));
+                        log.warn("Validation failed for petition DTO: {}", errorsMap);
                         return Mono.<CreatePetitionDTO>error(new ValidationException(
                                 "Error en la validación de los datos", errorsMap));
                     }
+
+                    log.debug("Petition DTO validation successful");
                     return Mono.just(dto);
                 })
                 .zipWith(serverRequest.principal())
@@ -74,14 +80,16 @@ public class Handler {
                     var petition = petitionMapper.toModel(tuple.getT1());
                     petition.setUserId(tuple.getT2().getName());
                     petition.setLoanStatus(LoanStatus.PENDING_REVIEW);
+                    log.info("Mapped petition");
                     return petition;
                 })
                 .flatMap(petitionUseCase::createPetition)
+                .doOnSuccess(p -> log.info("Successfully created petition with id={}", p.getId()))
+                .doOnError(e -> log.error("Error creating petition", e))
                 .as(transactionalOperator::transactional)
                 .flatMap(savedPetition -> ServerResponse.status(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(savedPetition));
-
     }
 
     @PreAuthorize("hasRole('ASESOR')")
@@ -90,10 +98,12 @@ public class Handler {
         int page = Integer.parseInt(request.queryParam("page").orElse("0"));
         int size = Integer.parseInt(request.queryParam("size").orElse("10"));
 
-        System.out.println("page: " + page + " size: " + size + " status: " + status );
+        log.info("Fetching petitions with status={} page={} size={}", status, page, size);
 
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(petitionUseCase.getAllPetitionsWithUserInfo(status, page, size), PetitionWithUserInfo.class);
+                .body(petitionUseCase.getAllPetitionsWithUserInfo(status, page, size), PetitionWithUserInfo.class)
+                .doOnSuccess(resp -> log.info("Successfully fetched petitions for status={} page={} size={}", status, page, size))
+                .doOnError(e -> log.error("Error fetching petitions", e));
     }
 }
