@@ -1,5 +1,6 @@
 package co.com.pragma.r2dbc.helper;
 
+import co.com.pragma.model.client.Client;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.data.domain.Example;
 import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;

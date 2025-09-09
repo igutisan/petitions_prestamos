@@ -1,5 +1,6 @@
 package co.com.pragma.api.config;
 
+import co.com.pragma.api.jwt.JwtAuthenticationManager;
 import co.com.pragma.api.jwt.JwtProvider;
 import co.com.pragma.api.jwt.SecurityContextRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,17 +22,18 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @Configuration
 public class SecurityConfig {
 
-    private final JwtProvider jwtProvider;
+    private final JwtAuthenticationManager jwtAuthenticationManager;
     private final SecurityContextRepository securityContextRepository;
 
     @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, JwtFilter jwtFilter) {
+
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges.pathMatchers("/api/v1/users").permitAll()
                         .anyExchange().authenticated()
                 )
-                .addFilterAfter(jwtFilter, SecurityWebFiltersOrder.FIRST)
+                .authenticationManager(jwtAuthenticationManager)
                 .securityContextRepository(securityContextRepository)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)

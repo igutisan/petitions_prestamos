@@ -6,7 +6,6 @@ import reactor.core.publisher.Mono;
 
 public interface ClientRepository {
     Mono<Void> insertUser(Client client);
-
     Mono<Client> findById(String userId);
     Flux<Client> findAll();
 }

@@ -4,6 +4,7 @@ import co.com.pragma.model.petition.Loantypes;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public record CreatePetitionDTO(
 
@@ -17,6 +18,6 @@ public record CreatePetitionDTO(
         String term,
 
         @NotNull(message = "El tipo de préstamo es obligatorio")
-        Loantypes loanType
+        UUID loanTypeId
 ) {
 }

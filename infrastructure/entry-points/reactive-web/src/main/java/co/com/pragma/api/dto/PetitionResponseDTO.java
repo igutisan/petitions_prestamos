@@ -10,7 +10,7 @@ public record PetitionResponseDTO(
         String dni,
         BigDecimal loanAmount,
         String term,
-        Loantypes loanType,
+        String loanTypeName,
         LoanStatus loanStatus
 ) {
 }

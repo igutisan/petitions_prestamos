@@ -8,6 +8,4 @@ public interface PetitionRepository {
 
     Mono<Petition> save(Petition petition);
 
-    Flux<Petition> findAll();
-    Flux<Petition> findByUserId(String userId);
 }

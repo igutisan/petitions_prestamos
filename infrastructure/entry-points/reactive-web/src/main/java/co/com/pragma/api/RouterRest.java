@@ -16,7 +16,9 @@ public class RouterRest {
             .path("/api/v1", builder ->
                     builder.POST("/petition", handlerV1::listenCreatePetition)
                             .GET("/petition", handlerV1::getAllPetitionsWithUserInfo)
-                            .POST("/users", handlerV1::listenCreateUser))
+                            .POST("/users", handlerV1::listenCreateUser)
+                            .POST("/loantype", handlerV1::listenCreateLoanType)
+                          )
             .build();
         }
 }

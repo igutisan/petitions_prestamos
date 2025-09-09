@@ -2,16 +2,16 @@ package co.com.pragma.r2dbc.petitionsRepos;
 
 import co.com.pragma.model.petitionwithuserinfo.PetitionWithUserInfo;
 import co.com.pragma.model.petitionwithuserinfo.gateways.PetitionWithUserInfoRepository;
-import co.com.pragma.r2dbc.dto.PetitionWithUserInfoData;
 import co.com.pragma.r2dbc.helper.ReactiveAdapterOperations;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Repository
 public class PetitionWithUserInfoAdapter extends ReactiveAdapterOperations<
         PetitionWithUserInfo,
-        PetitionWithUserInfoData,
+        PetitionWithUserInfo,
         String,
         PetitionWithUserInfoReactiveRepository
         > implements PetitionWithUserInfoRepository {
@@ -28,12 +28,19 @@ public class PetitionWithUserInfoAdapter extends ReactiveAdapterOperations<
                 .map(data -> PetitionWithUserInfo.builder()
                         .loanAmount(data.getLoanAmount())
                         .term(data.getTerm())
-                        .loanType(data.getLoanType())
+                        .loanTypeName(data.getLoanTypeName())
                         .loanStatus(data.getLoanStatus())
                         .userEmail(data.getUserEmail())
                         .userName(data.getUserName())
                         .userSalary(data.getUserSalary())
+                        .interestRate(data.getInterestRate())
+                        .monthlyAmountRequest(data.getMonthlyAmountRequest())
                         .build()
                 );
+    }
+
+    @Override
+    public Mono<Long> countByStatus(String status) {
+        return repository.countByStatus(status);
     }
 }

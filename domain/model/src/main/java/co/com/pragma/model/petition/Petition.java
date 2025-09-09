@@ -15,10 +15,10 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 public class Petition {
     private UUID id;
-    private String userId;
+    private UUID userId;
     private BigDecimal loanAmount;
     private String term;
-    private Loantypes loanType;
+    private UUID loanTypeId;
     private LoanStatus loanStatus;
 
 }

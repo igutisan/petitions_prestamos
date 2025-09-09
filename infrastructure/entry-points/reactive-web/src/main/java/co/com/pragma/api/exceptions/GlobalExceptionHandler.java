@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Mono;
 
@@ -39,7 +40,7 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
     private Mono<ServerResponse> formatErrorResponse(ServerRequest request) {
         Throwable error = getError(request);
 
-
+        // Manejar excepciones de DTO
         if (error instanceof ValidationException validationException) {
             return buildErrorResponse(
                     HttpStatus.BAD_REQUEST,
@@ -49,6 +50,7 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
                     validationException.getFieldErrors()
             );
         }
+
 
 
         // Manejar InavlidUserException
@@ -77,6 +79,27 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
             return buildErrorResponse(
                     HttpStatus.BAD_REQUEST,
                     "INVALID_ARGUMENT",
+                    error.getMessage(),
+                    request.path()
+            );
+        }
+
+        //Manejo de errores de falta de permisos
+        if (error instanceof HttpClientErrorException.Forbidden){
+            return buildErrorResponse(
+                    HttpStatus.FORBIDDEN,
+                    "FORBIDDEN",
+                    error.getMessage(),
+                    request.path()
+            );
+        }
+
+
+        //Manejo de errores de falta de token
+        if (error instanceof HttpClientErrorException.Unauthorized) {
+            return buildErrorResponse(
+                    HttpStatus.UNAUTHORIZED,
+                    "UNAUTHORIZED",
                     error.getMessage(),
                     request.path()
             );

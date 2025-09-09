@@ -2,12 +2,16 @@ package co.com.pragma.api;
 
 import co.com.pragma.api.dto.CreatePetitionDTO;
 import co.com.pragma.api.dto.CreateClientDTO;
+import co.com.pragma.api.dto.LoanTypeDTO;
+import co.com.pragma.api.dto.PageResponse;
 import co.com.pragma.api.exceptions.ValidationException;
 import co.com.pragma.api.mapper.ClientDTOMapper;
+import co.com.pragma.api.mapper.LoanTypeMapper;
 import co.com.pragma.api.mapper.PetitionDTOMapper;
 import co.com.pragma.model.petition.LoanStatus;
 import co.com.pragma.model.petitionwithuserinfo.PetitionWithUserInfo;
 import co.com.pragma.usecase.client.ClientUseCase;
+import co.com.pragma.usecase.loantype.LoanTypeUseCase;
 import co.com.pragma.usecase.petition.PetitionUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,9 +27,11 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -35,9 +41,11 @@ public class Handler {
     private final Validator validator;
     private final PetitionDTOMapper petitionMapper;
     private final ClientDTOMapper clientMapper;
+    private final LoanTypeMapper loanTypeMapper;
     private final TransactionalOperator transactionalOperator;
     private final PetitionUseCase petitionUseCase;
     private final ClientUseCase clientUseCase;
+    private final LoanTypeUseCase loanTypeUseCase;
 
 
     public Mono<ServerResponse> listenCreateUser(ServerRequest serverRequest) {
@@ -78,7 +86,7 @@ public class Handler {
                 .zipWith(serverRequest.principal())
                 .map(tuple -> {
                     var petition = petitionMapper.toModel(tuple.getT1());
-                    petition.setUserId(tuple.getT2().getName());
+                    petition.setUserId(UUID.fromString(tuple.getT2().getName()));
                     petition.setLoanStatus(LoanStatus.PENDING_REVIEW);
                     log.info("Mapped petition");
                     return petition;
@@ -94,16 +102,46 @@ public class Handler {
 
     @PreAuthorize("hasRole('ASESOR')")
     public Mono<ServerResponse> getAllPetitionsWithUserInfo(ServerRequest request) {
-        String status = request.queryParam("status").orElse("PENDING_REVIEW");
+        String status = request.queryParam("status").orElse(null);
         int page = Integer.parseInt(request.queryParam("page").orElse("0"));
         int size = Integer.parseInt(request.queryParam("size").orElse("10"));
 
-        log.info("Fetching petitions with status={} page={} size={}", status, page, size);
-
+        Mono<Long> totalMono = petitionUseCase.countByStatus(status);
+        Flux<PetitionWithUserInfo> data = petitionUseCase.getAllPetitionsWithUserInfo(status, page, size);
+        Mono<PageResponse<PetitionWithUserInfo>> response = totalMono.flatMap(total ->
+                data.collectList().map(content -> PageResponse.<PetitionWithUserInfo>builder()
+                        .content(content)
+                        .page(page)
+                        .size(size)
+                        .totalElements(total)
+                        .totalPages((int) Math.ceil((double) total / size))
+                        .build()
+                )
+        );
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(petitionUseCase.getAllPetitionsWithUserInfo(status, page, size), PetitionWithUserInfo.class)
-                .doOnSuccess(resp -> log.info("Successfully fetched petitions for status={} page={} size={}", status, page, size))
+                .body(response, PetitionWithUserInfo.class)
                 .doOnError(e -> log.error("Error fetching petitions", e));
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<ServerResponse> listenCreateLoanType(ServerRequest serverRequest) {
+        log.info("Received request to create a new loan type");
+        return serverRequest.bodyToMono(LoanTypeDTO.class)
+                .map(loanTypeMapper::toModel)
+                .flatMap(loanTypeUseCase::save)
+                .doOnSuccess(loanType -> log.info("Successfully created loan type"))
+                .doOnError(e -> log.error("Error creating loan type", e))
+                .map(loanTypeMapper::toDto)
+                .as(transactionalOperator::transactional)
+                .flatMap(savedLoanType -> ServerResponse.status(HttpStatus.CREATED)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(savedLoanType));
+    }
+
 }
+
+
+//Terminar la HU4
+//Hacer la HU5
+//Hacer la HU6

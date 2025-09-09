@@ -23,12 +23,12 @@ public class PetitionEntity {
     @Id
     private UUID id;
     @Column("user_id")
-    private String userId;
+    private UUID userId;
     @Column("loan_amount")
     private BigDecimal loanAmount;
     private String term;
-    @Column("loan_type")
-    private Loantypes loanType;
+    @Column("loan_type_id")
+    private UUID loanTypeId;
     @Column("loan_status")
     private LoanStatus loanStatus ;
 }
