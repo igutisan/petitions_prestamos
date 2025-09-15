@@ -14,6 +14,12 @@ local.properties
 .loadpath
 .recommenders
 
+#AWS
+.aws
+
+#env
+.env
+
 # External tool builders
 .externalToolBuilders/
 

@@ -62,7 +62,7 @@ resilience4j:
         minimumNumberOfCalls: 10
         waitDurationInOpenState: "10s"
 jwt:
-  secret: "${JWT_SECRET:bXlzZWNyZXRrZXlmb3Jqd3RzZWNyZXRrZXltdXN0YmVsb25nZW5vdWdoZm9ySFMyNTZhbGdvcml0aG0=}"
+  secret: "${JWT_SECRET:}"
 adapters:
   r2dbc:
     host: "localhost"

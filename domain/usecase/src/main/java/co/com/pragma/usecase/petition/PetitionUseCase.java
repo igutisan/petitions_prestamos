@@ -33,6 +33,8 @@ public class PetitionUseCase {
     private final MessageQueueGateway messageQueueGateway;
     private final LoggerGateway loggerGateway;
 
+
+    // Writes
     public Mono<Petition> createPetition(Petition petition) {
         Mono<LoanType> loanTypeMono = loanTypeRepository.findById(String.valueOf(petition.getLoanTypeId()))
                 .switchIfEmpty(Mono.error(new NotFoundException("El tipo de préstamo con ID "
@@ -76,20 +78,6 @@ public class PetitionUseCase {
         }));
     }
 
-    public Flux<PetitionWithUserInfo> getAllPetitionsWithUserInfo(String status, int page, int size) {
-        return petitionWithUserInfoRepository.findAllWithUserInfo(status, page, size)
-                .map(data -> {
-                    data.setMonthlyAmountRequest(
-                            monthlyAmountRequest(
-                                    data.getInterestRate(),
-                                    data.getLoanAmount(),
-                                    data.getTerm()
-                            )
-                    );
-                    return data;
-                });
-    }
-
     public Mono<PetitionWithUserInfo> updatePetitionStatus(ValidationResponseDTO validationResponseDTO) {
 
 
@@ -119,9 +107,29 @@ public class PetitionUseCase {
                 });
     }
 
+
+    // Reads
+
+    public Flux<PetitionWithUserInfo> getAllPetitionsWithUserInfo(String status, int page, int size) {
+        return petitionWithUserInfoRepository.findAllWithUserInfo(status, page, size)
+                .map(data -> {
+                    data.setMonthlyAmountRequest(
+                            monthlyAmountRequest(
+                                    data.getInterestRate(),
+                                    data.getLoanAmount(),
+                                    data.getTerm()
+                            )
+                    );
+                    return data;
+                });
+    }
+
+
     public Mono<Long> countByStatus(String status){
         return petitionWithUserInfoRepository.countByStatus(status);
     }
+
+    //Auxiliary methods
 
     private BigDecimal monthlyAmountRequest(double annualInterestRate, BigDecimal amount, int months) {
 
