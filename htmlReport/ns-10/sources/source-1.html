@@ -1,0 +1,183 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ReactiveAdapterOperations</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">co.com.pragma.r2dbc.helper</a>
+</div>
+
+<h1>Coverage Summary for Class: ReactiveAdapterOperations (co.com.pragma.r2dbc.helper)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ReactiveAdapterOperations</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package co.com.pragma.r2dbc.helper;
+&nbsp;
+&nbsp;import org.reactivecommons.utils.ObjectMapper;
+&nbsp;import org.springframework.data.domain.Example;
+&nbsp;import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;
+&nbsp;import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+&nbsp;import reactor.core.publisher.Flux;
+&nbsp;import reactor.core.publisher.Mono;
+&nbsp;
+&nbsp;import java.lang.reflect.ParameterizedType;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;public abstract class ReactiveAdapterOperations&lt;E, D, I, R extends ReactiveCrudRepository&lt;D, I&gt; &amp; ReactiveQueryByExampleExecutor&lt;D&gt;&gt; {
+&nbsp;    protected R repository;
+&nbsp;    protected ObjectMapper mapper;
+&nbsp;    private final Class&lt;D&gt; dataClass;
+&nbsp;    private final Function&lt;D, E&gt; toEntityFn;
+&nbsp;
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+<b class="nc">&nbsp;    protected ReactiveAdapterOperations(R repository, ObjectMapper mapper, Function&lt;D, E&gt; toEntityFn) {</b>
+<b class="nc">&nbsp;        this.repository = repository;</b>
+<b class="nc">&nbsp;        this.mapper = mapper;</b>
+<b class="nc">&nbsp;        ParameterizedType genericSuperclass = (ParameterizedType) this.getClass().getGenericSuperclass();</b>
+<b class="nc">&nbsp;        this.dataClass = (Class&lt;D&gt;) genericSuperclass.getActualTypeArguments()[1];</b>
+<b class="nc">&nbsp;        this.toEntityFn = toEntityFn;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected D toData(E entity) {
+<b class="nc">&nbsp;        return mapper.map(entity, dataClass);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected E toEntity(D data) {
+<b class="nc">&nbsp;        return data != null ? toEntityFn.apply(data) : null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Mono&lt;E&gt; save(E entity) {
+<b class="nc">&nbsp;        return saveData(toData(entity))</b>
+<b class="nc">&nbsp;                .map(this::toEntity);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected Flux&lt;E&gt; saveAllEntities(Flux&lt;E&gt; entities) {
+<b class="nc">&nbsp;        return saveData(entities.map(this::toData))</b>
+<b class="nc">&nbsp;                .map(this::toEntity);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected Mono&lt;D&gt; saveData(D data) {
+<b class="nc">&nbsp;        return repository.save(data);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected Flux&lt;D&gt; saveData(Flux&lt;D&gt; data) {
+<b class="nc">&nbsp;        return repository.saveAll(data);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Mono&lt;E&gt; findById(I id) {
+<b class="nc">&nbsp;        return repository.findById(id).map(this::toEntity);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Flux&lt;E&gt; findByExample(E entity) {
+<b class="nc">&nbsp;        return repository.findAll(Example.of(toData(entity)))</b>
+<b class="nc">&nbsp;                .map(this::toEntity);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Flux&lt;E&gt; findAll() {
+<b class="nc">&nbsp;        return repository.findAll()</b>
+<b class="nc">&nbsp;                .map(this::toEntity);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-04 16:12</div>
+</div>
+</body>
+</html>

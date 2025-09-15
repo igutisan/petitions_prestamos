@@ -26,6 +26,10 @@ public class PetitionRepositoryAdapter extends ReactiveAdapterOperations<
         return super.save(petition);
     }
 
+    @Override
+    public Flux<Petition> findAllActiveLoadsByUser(String userId) {
+        return null;
+    }
 
 
 }

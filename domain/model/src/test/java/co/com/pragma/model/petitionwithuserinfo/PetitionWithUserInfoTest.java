@@ -2,7 +2,6 @@
 package co.com.pragma.model.petitionwithuserinfo;
 
 import co.com.pragma.model.petition.LoanStatus;
-import co.com.pragma.model.petition.Loantypes;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

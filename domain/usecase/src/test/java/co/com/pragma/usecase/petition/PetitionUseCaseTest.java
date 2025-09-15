@@ -3,7 +3,6 @@ package co.com.pragma.usecase.petition;
 
 import co.com.pragma.model.client.gateways.ClientRepository;
 import co.com.pragma.model.petition.LoanStatus;
-import co.com.pragma.model.petition.Loantypes;
 import co.com.pragma.model.petition.Petition;
 import co.com.pragma.model.petition.gateways.AuthenticationGateway;
 import co.com.pragma.model.petition.gateways.LoggerGateway;

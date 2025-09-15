@@ -39,6 +39,7 @@ This layer provides the concrete implementations (adapters) for the ports define
     - **`r2dbc-postgresql`**: Implements the `PetitionRepository` port for data persistence using a reactive connection to a PostgreSQL database.
     - **`rest-consumer`**: Implements the `AuthenticationGateway` port by consuming an external REST service to validate users.
     - **`logger-adapter`**: Implements the `LoggerGateway` port to provide a structured logging mechanism.
+    - **`sqs-sender`**: Implements a port for sending messages to AWS SQS.
 
 ### `applications`
 This layer is responsible for the configuration and assembly of the entire application.
@@ -64,9 +65,29 @@ This layer is responsible for the configuration and assembly of the entire appli
 
 ## 4. Technology Stack
 
-- **Language**: Java
-- **Framework**: Spring Boot / Spring WebFlux (Reactive)
+- **Language**: Java 21
+- **Framework**: Spring Boot 3 / Spring WebFlux (Reactive)
 - **Build Tool**: Gradle (Multi-module project)
 - **Database**: PostgreSQL (with R2DBC for reactive access)
-- **Auxiliary**: Lombok
+- **Messaging**: AWS SQS
+- **Auxiliary**: Lombok, Mapstruct
 - **Deployment**: Docker
+
+---
+
+## 5. Testing
+
+The project has a comprehensive testing strategy:
+
+- **Unit Testing**: Services and reactive operators are tested using `StepVerifier` from the `reactor-test` project.
+- **Integration Testing**: Controllers and the entire flow are tested with `@SpringBootTest` and `WebTestClient`.
+- **Code Coverage**: Jacoco is used to measure code coverage.
+- **Mutation Testing**: Pitest is used for mutation testing to assess the quality of the tests.
+- **Blocking Code Detection**: BlockHound is used to detect blocking calls in non-blocking threads.
+
+---
+
+## 6. Code Style
+
+- **Lombok**: Used to reduce boilerplate code for getters, setters, constructors, etc.
+- **Mapstruct**: Used for mapping between DTOs and domain models.

@@ -1,0 +1,52 @@
+package co.com.pragma.sqs.sender;
+
+import co.com.pragma.model.petition.gateways.MessageQueueGateway;
+import co.com.pragma.sqs.sender.config.SQSSenderProperties;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+import software.amazon.awssdk.services.sqs.SqsAsyncClient;
+import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
+import software.amazon.awssdk.services.sqs.model.SendMessageResponse;
+
+@Service
+@Log4j2
+@RequiredArgsConstructor
+public class SQSSender implements MessageQueueGateway {
+    private final SQSSenderProperties properties;
+    private final SqsAsyncClient client;
+    private final ObjectMapper objectMapper;
+
+
+    @Override
+    public Mono<String> sendMessageToNotificationQueue(Object message) {
+        return sendToQueue(message, properties.sender().notificationQueueUrl());
+    }
+
+    @Override
+    public Mono<String> sendMessageToAutomaticValidation(Object message) {
+        return sendToQueue(message, properties.sender().automaticValidationQueueUrl());
+    }
+
+    private Mono<String> sendToQueue(Object message, String queueUrl) {
+        return Mono.fromCallable(() -> {
+                    String json = objectMapper.writeValueAsString(message);
+                    return SendMessageRequest.builder()
+                            .queueUrl(queueUrl)
+                            .messageBody(json)
+                            .build();
+                })
+                .flatMap(request -> Mono.fromFuture(client.sendMessage(request)))
+                .doOnNext(response -> log.debug("Message sent to {} with id {}", queueUrl, response.messageId()))
+                .map(SendMessageResponse::messageId);
+    }
+
+
+}

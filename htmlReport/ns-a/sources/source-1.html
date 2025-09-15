@@ -1,0 +1,157 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RestConsumerConfig</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">co.com.pragma.consumer.config</a>
+</div>
+
+<h1>Coverage Summary for Class: RestConsumerConfig (co.com.pragma.consumer.config)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RestConsumerConfig</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package co.com.pragma.consumer.config;
+&nbsp;
+&nbsp;import io.netty.handler.timeout.ReadTimeoutHandler;
+&nbsp;import io.netty.handler.timeout.WriteTimeoutHandler;
+&nbsp;import org.springframework.beans.factory.annotation.Value;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.http.HttpHeaders;
+&nbsp;import org.springframework.http.client.reactive.ClientHttpConnector;
+&nbsp;import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+&nbsp;import org.springframework.web.reactive.function.client.WebClient;
+&nbsp;import reactor.netty.http.client.HttpClient;
+&nbsp;
+&nbsp;import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
+&nbsp;import static java.util.concurrent.TimeUnit.MILLISECONDS;
+&nbsp;
+&nbsp;@Configuration
+&nbsp;public class RestConsumerConfig {
+&nbsp;
+&nbsp;    private final String url;
+&nbsp;
+&nbsp;    private final int timeout;
+&nbsp;
+&nbsp;    public RestConsumerConfig(@Value(&quot;${adapter.restconsumer.url}&quot;) String url,
+<b class="nc">&nbsp;                              @Value(&quot;${adapter.restconsumer.timeout}&quot;) int timeout) {</b>
+<b class="nc">&nbsp;        this.url = url;</b>
+<b class="nc">&nbsp;        this.timeout = timeout;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Bean
+&nbsp;    public WebClient getWebClient(WebClient.Builder builder) {
+<b class="nc">&nbsp;        return builder</b>
+<b class="nc">&nbsp;            .baseUrl(url)</b>
+<b class="nc">&nbsp;            .defaultHeader(HttpHeaders.CONTENT_TYPE, &quot;application/json&quot;)</b>
+<b class="nc">&nbsp;            .clientConnector(getClientHttpConnector())</b>
+<b class="nc">&nbsp;            .build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private ClientHttpConnector getClientHttpConnector() {
+&nbsp;        /*
+&nbsp;        IF YO REQUIRE APPEND SSL CERTIFICATE SELF SIGNED: this should be in the default cacerts trustore
+&nbsp;        */
+<b class="nc">&nbsp;        return new ReactorClientHttpConnector(HttpClient.create()</b>
+<b class="nc">&nbsp;                .compress(true)</b>
+<b class="nc">&nbsp;                .keepAlive(true)</b>
+<b class="nc">&nbsp;                .option(CONNECT_TIMEOUT_MILLIS, timeout)</b>
+<b class="nc">&nbsp;                .doOnConnected(connection -&gt; {</b>
+<b class="nc">&nbsp;                    connection.addHandlerLast(new ReadTimeoutHandler(timeout, MILLISECONDS));</b>
+<b class="nc">&nbsp;                    connection.addHandlerLast(new WriteTimeoutHandler(timeout, MILLISECONDS));</b>
+&nbsp;                }));
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-04 16:12</div>
+</div>
+</body>
+</html>

@@ -1,7 +1,6 @@
 package co.com.pragma.api.dto;
 
 import co.com.pragma.model.petition.LoanStatus;
-import co.com.pragma.model.petition.Loantypes;
 
 import java.math.BigDecimal;
 

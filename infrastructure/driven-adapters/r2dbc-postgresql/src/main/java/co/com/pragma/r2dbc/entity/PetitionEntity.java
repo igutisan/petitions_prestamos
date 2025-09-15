@@ -1,7 +1,6 @@
 package co.com.pragma.r2dbc.entity;
 
 import co.com.pragma.model.petition.LoanStatus;
-import co.com.pragma.model.petition.Loantypes;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

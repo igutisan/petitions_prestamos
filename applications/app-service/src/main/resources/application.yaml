@@ -29,6 +29,17 @@ adapter:
   restconsumer:
     timeout: 5000
     url: "http://localhost:8080/api/v1/users/"
+  sqs:
+    region: "us-east-2"
+    endpoint: "https://sqs.us-east-2.amazonaws.com"
+    sender:
+      notification-queue-url: "https://sqs.us-east-2.amazonaws.com/471112759721/solictudes-estado"
+      automatic-validation-queue-url: "https://sqs.us-east-2.amazonaws.com/471112759721/capacidad-endeudamiento"
+    listener:
+        response-validation-queue-url: "https://sqs.us-east-2.amazonaws.com/471112759721/respuesta-solicitudesd"
+        max-messages: 10
+        wait-time: 20
+        concurrency: 5
 resilience4j:
   circuitbreaker:
     instances:
@@ -51,9 +62,7 @@ resilience4j:
         minimumNumberOfCalls: 10
         waitDurationInOpenState: "10s"
 jwt:
-  secret: ${JWT_SECRET:bXlzZWNyZXRrZXlmb3Jqd3RzZWNyZXRrZXltdXN0YmVsb25nZW5vdWdoZm9ySFMyNTZhbGdvcml0aG0=}
-
-
+  secret: "${JWT_SECRET:bXlzZWNyZXRrZXlmb3Jqd3RzZWNyZXRrZXltdXN0YmVsb25nZW5vdWdoZm9ySFMyNTZhbGdvcml0aG0=}"
 adapters:
   r2dbc:
     host: "localhost"
@@ -62,16 +71,12 @@ adapters:
     schema: "public"
     username: "test"
     password: "P@55w0rd"
-
-
-
 springdoc:
   api-docs:
-    path: /api-docs
+    path: "/api-docs"
   swagger-ui:
-    path: /swagger-ui.html
-  packages-to-scan: co.com.pragma.api
-
+    path: "/swagger-ui.html"
+  packages-to-scan: "co.com.pragma.api"
 info:
   app:
     name: "Auth Service"

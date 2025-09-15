@@ -18,6 +18,7 @@ public class RouterRest {
                             .GET("/petition", handlerV1::getAllPetitionsWithUserInfo)
                             .POST("/users", handlerV1::listenCreateUser)
                             .POST("/loantype", handlerV1::listenCreateLoanType)
+                            .PATCH("/petition/{id}", handlerV1::listenUpdatePetitionStatus)
                           )
             .build();
         }

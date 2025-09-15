@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Repository
 public class PetitionWithUserInfoAdapter extends ReactiveAdapterOperations<
         PetitionWithUserInfo,
@@ -26,6 +28,7 @@ public class PetitionWithUserInfoAdapter extends ReactiveAdapterOperations<
 
         return repository.findAllWithUserInfo(status, size, offset)
                 .map(data -> PetitionWithUserInfo.builder()
+                        .id(data.getId())
                         .loanAmount(data.getLoanAmount())
                         .term(data.getTerm())
                         .loanTypeName(data.getLoanTypeName())
@@ -40,7 +43,17 @@ public class PetitionWithUserInfoAdapter extends ReactiveAdapterOperations<
     }
 
     @Override
+    public Mono<PetitionWithUserInfo> findByIdWithUserInfo(UUID id) {
+        return repository.findByIdWithUserInfo(id);
+    }
+
+    @Override
     public Mono<Long> countByStatus(String status) {
         return repository.countByStatus(status);
+    }
+
+    @Override
+    public Flux<PetitionWithUserInfo> findAllActiveLoadsWithUserInfo(UUID id) {
+        return repository.findAllActiveLoadsWithUserInfo(id);
     }
 }

@@ -17,7 +17,7 @@ public class Petition {
     private UUID id;
     private UUID userId;
     private BigDecimal loanAmount;
-    private String term;
+    private int term;
     private UUID loanTypeId;
     private LoanStatus loanStatus;
 
