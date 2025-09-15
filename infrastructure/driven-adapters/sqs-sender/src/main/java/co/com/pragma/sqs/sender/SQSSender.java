@@ -4,20 +4,16 @@ import co.com.pragma.model.petition.gateways.MessageQueueGateway;
 import co.com.pragma.sqs.sender.config.SQSSenderProperties;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
-import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 import software.amazon.awssdk.services.sqs.model.SendMessageResponse;
 
 @Service
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 public class SQSSender implements MessageQueueGateway {
     private final SQSSenderProperties properties;

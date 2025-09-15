@@ -7,7 +7,6 @@ import co.com.pragma.model.exceptions.NotFoundException;
 import co.com.pragma.model.loantype.LoanType;
 import co.com.pragma.model.loantype.gateways.LoanTypeRepository;
 import co.com.pragma.model.petition.Petition;
-import co.com.pragma.model.petition.gateways.LoggerGateway;
 import co.com.pragma.model.petition.gateways.MessageQueueGateway;
 import co.com.pragma.model.petition.gateways.PetitionRepository;
 import co.com.pragma.model.petitionwithuserinfo.PetitionWithUserInfo;
@@ -31,7 +30,6 @@ public class PetitionUseCase {
     private final ClientRepository clientRepository;
     private final LoanTypeRepository loanTypeRepository;
     private final MessageQueueGateway messageQueueGateway;
-    private final LoggerGateway loggerGateway;
 
 
     // Writes
@@ -53,8 +51,6 @@ public class PetitionUseCase {
             if (!loanType.isAutomaticValidation()) {
                 return Mono.just(savedPetition);
             }
-
-            loggerGateway.logInfo("Enviando a validación automática la petición: " + savedPetition.getId());
 
             return petitionWithUserInfoRepository.findAllActiveLoadsWithUserInfo(savedPetition.getUserId())
                     .collectList() // <-- Materializa el Flux en un Mono<List<...>>
@@ -84,14 +80,11 @@ public class PetitionUseCase {
         return petitionRepository.findById(String.valueOf(validationResponseDTO.getPetitionId()))
                 .switchIfEmpty(Mono.error(new NotFoundException("La petición con ID " + validationResponseDTO.getPetitionId() + " no fue encontrada.")))
                 .flatMap(existingPetition -> {
-                    loggerGateway.logInfo("status de dto: "+ validationResponseDTO.getStatus());
                     existingPetition.setLoanStatus(validationResponseDTO.getStatus());
                     return petitionRepository.save(existingPetition);
                 })
                 .flatMap(updatedPetition -> petitionWithUserInfoRepository.findByIdWithUserInfo(updatedPetition.getId()))
                 .flatMap(petitionWithInfo -> {
-                    loggerGateway.logInfo("status: "+ petitionWithInfo.getLoanStatus());
-                    loggerGateway.logInfo("Client: "+petitionWithInfo.getUserName());
                     PetitionStatusMessage message = new PetitionStatusMessage(
                             petitionWithInfo.getUserName(),
                             petitionWithInfo.getLoanStatus().toString(),

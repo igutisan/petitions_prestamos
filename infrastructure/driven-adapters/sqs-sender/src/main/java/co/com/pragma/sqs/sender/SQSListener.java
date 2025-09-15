@@ -6,7 +6,7 @@ import co.com.pragma.usecase.petition.dto.ValidationResponseDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,7 +17,7 @@ import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 
 @Service
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 public class SQSListener {
     private final SqsAsyncClient sqsAsyncClient;

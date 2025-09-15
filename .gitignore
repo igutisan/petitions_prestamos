@@ -114,7 +114,7 @@ local.properties
 # *.ipr
 
 # CMake
-cmake-build-*/
+cmake-build-*
 
 # Mongo Explorer plugin
 .idea/**/mongoSettings.xml
@@ -337,6 +337,18 @@ gradle-app.setting
 # End of https://www.gitignore.io/api/java,linux,macos,sonar,gradle,windows,eclipse,sonarqube,sublimetext,intellij+all,visualstudiocode
 
 # HPROF
-# -----
+# ----- 
 *.hprof
 build-cache
+
+# Project-specific ignores
+aws/
+htmlReport/
+postgres-data/
+
+# Ignore all markdown files, but keep the important ones
+*.md
+!README.md
+GEMINI.md
+!guidelines.md
+WARP.md

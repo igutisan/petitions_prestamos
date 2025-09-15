@@ -4,7 +4,6 @@ dependencies {
 	implementation project(':sqs-sender')
 	implementation project(':metrics')
 	implementation 'software.amazon.awssdk:sts'
-	implementation project(':logger-adapter')
 	implementation project(':rest-consumer')
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation project(':reactive-web')
@@ -31,4 +30,13 @@ jar {
 bootJar {
     // Sets output jar name
     archiveFileName = "${project.getParent().getName()}.${archiveExtension.get()}"
+}
+
+configurations {
+    all {
+        exclude group: "org.apache.logging.log4j", module: "log4j-slf4j2-impl"
+        exclude group: "org.apache.logging.log4j", module: "log4j-to-slf4j"
+        exclude group: "org.apache.logging.log4j", module: "log4j-core"
+        exclude group: "org.apache.logging.log4j", module: "log4j-api"
+    }
 }
