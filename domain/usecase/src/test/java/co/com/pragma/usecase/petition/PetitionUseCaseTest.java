@@ -7,7 +7,6 @@ import co.com.pragma.model.loantype.LoanType;
 import co.com.pragma.model.loantype.gateways.LoanTypeRepository;
 import co.com.pragma.model.petition.LoanStatus;
 import co.com.pragma.model.petition.Petition;
-import co.com.pragma.model.petition.gateways.LoggerGateway;
 import co.com.pragma.model.petition.gateways.MessageQueueGateway;
 import co.com.pragma.model.petition.gateways.PetitionRepository;
 import co.com.pragma.model.petitionwithuserinfo.PetitionWithUserInfo;
@@ -47,8 +46,6 @@ class PetitionUseCaseTest {
     private LoanTypeRepository loanTypeRepository;
     @Mock
     private MessageQueueGateway messageQueueGateway;
-    @Mock
-    private LoggerGateway loggerGateway;
 
     @InjectMocks
     private PetitionUseCase petitionUseCase;
@@ -84,7 +81,8 @@ class PetitionUseCaseTest {
                 .expectNext(petition)
                 .verifyComplete();
 
-        verify(loggerGateway).logInfo("Enviando a validación automática la petición: " + petition.getId());
+        // Verify that automatic validation message was sent
+        verify(messageQueueGateway).sendMessageToAutomaticValidation(any());
     }
 
     @Test
@@ -170,13 +168,22 @@ class PetitionUseCaseTest {
         UUID petitionId = UUID.randomUUID();
         ValidationResponseDTO validationResponseDTO = new ValidationResponseDTO(petitionId.toString(), LoanStatus.APPROVED);
         Petition petition = Petition.builder().id(petitionId).loanStatus(LoanStatus.PENDING_REVIEW).build();
-        PetitionWithUserInfo petitionWithUserInfo = PetitionWithUserInfo.builder().id(petitionId.toString()).loanStatus(LoanStatus.APPROVED).build();
+        PetitionWithUserInfo petitionWithUserInfo = PetitionWithUserInfo.builder()
+                .id(petitionId.toString())
+                .loanStatus(LoanStatus.APPROVED)
+                .userName("Test User")
+                .userEmail("test@test.com")
+                .term(12)
+                .loanAmount(new BigDecimal("10000"))
+                .interestRate(10.0)
+                .build();
         ArgumentCaptor<Petition> petitionCaptor = ArgumentCaptor.forClass(Petition.class);
 
         when(petitionRepository.findById(anyString())).thenReturn(Mono.just(petition));
         when(petitionRepository.save(petitionCaptor.capture())).thenReturn(Mono.just(petition));
         when(petitionWithUserInfoRepository.findByIdWithUserInfo(any(UUID.class))).thenReturn(Mono.just(petitionWithUserInfo));
         when(messageQueueGateway.sendMessageToNotificationQueue(any())).thenReturn(Mono.empty());
+        when(messageQueueGateway.sendMessageToAcceptedPetitionsQueue(any())).thenReturn(Mono.empty());
 
         // Act
         Mono<PetitionWithUserInfo> result = petitionUseCase.updatePetitionStatus(validationResponseDTO);
@@ -187,9 +194,9 @@ class PetitionUseCaseTest {
                 .verifyComplete();
 
         assertEquals(LoanStatus.APPROVED, petitionCaptor.getValue().getLoanStatus());
-        verify(loggerGateway).logInfo("status de dto: " + validationResponseDTO.getStatus());
-        verify(loggerGateway).logInfo("status: " + petitionWithUserInfo.getLoanStatus());
-        verify(loggerGateway).logInfo("Client: " + petitionWithUserInfo.getUserName());
+        // Verify that messages were sent to the queues
+        verify(messageQueueGateway).sendMessageToNotificationQueue(any());
+        verify(messageQueueGateway).sendMessageToAcceptedPetitionsQueue(any());
     }
 
     @Test

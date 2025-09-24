@@ -14,7 +14,7 @@ public record CreatePetitionDTO(
 
         @NotBlank(message = "El plazo no puede estar vacío")
         @Pattern(regexp = "^(6|12|24|36|48|60)$", message = "El plazo debe ser uno de: 6, 12, 24, 36, 48 o 60 meses")
-        String term,
+        int term,
 
         @NotNull(message = "El tipo de préstamo es obligatorio")
         UUID loanTypeId

@@ -30,7 +30,12 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchanges -> exchanges.pathMatchers("/api/v1/users").permitAll()
+                .authorizeExchange(exchanges ->
+                        exchanges.pathMatchers("/api/v1/users").permitAll()
+                        .pathMatchers("/actuator/**").permitAll()
+                                .pathMatchers("/swagger-ui/**",
+                                        "/v3/api-docs/**",
+                                        "/webjars/swagger-ui/**").permitAll()
                         .anyExchange().authenticated()
                 )
                 .authenticationManager(jwtAuthenticationManager)

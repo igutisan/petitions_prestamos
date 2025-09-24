@@ -4,10 +4,8 @@ import co.com.pragma.api.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -17,7 +15,6 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,7 +29,7 @@ public class JwtFilter implements WebFilter {
         String path = exchange.getRequest().getPath().value();
 
 
-        if(path.contains("users")) {
+        if(path.contains("users")|| path.contains("actuator")|| path.contains("swagger-ui")|| path.contains("v3/api-docs")) {
             return chain.filter(exchange);
         }
 

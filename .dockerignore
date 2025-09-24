@@ -1,0 +1,92 @@
+# ====================================================================
+# .dockerignore - Optimiza el contexto de build de Docker
+# ====================================================================
+
+# Git and version control
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# Build artifacts (excepto el JAR final que necesitamos)
+.gradle/
+build/
+!applications/app-service/build/libs/auth_loans.jar
+gradle-app.setting
+out/
+target/
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+.metadata/
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+
+# Logs
+*.log
+logs/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Documentation
+*.md
+!deployment/README.md
+docs/
+
+# Test files
+src/test/
+**/test/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Local environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+postgres-data/
+
+# Docker files (no necesarios en el contexto)
+docker-compose*.yml
+docker-compose*.yaml
+Dockerfile*
+!deployment/Dockerfile
+
+# Gradle wrapper (ya incluido en la imagen base)
+gradlew*
+gradle/wrapper/
+
+# Application specific
+cache/
+reports/
+coverage/
+.nyc_output

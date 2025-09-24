@@ -22,16 +22,21 @@ public class SQSSender implements MessageQueueGateway {
 
 
     @Override
-    public Mono<String> sendMessageToNotificationQueue(Object message) {
+    public Mono<Void> sendMessageToAcceptedPetitionsQueue(Object message) {
+        return sendToQueue(message, properties.sender().acceptedPetitionsQueueUrl());
+    }
+
+    @Override
+    public Mono<Void> sendMessageToNotificationQueue(Object message) {
         return sendToQueue(message, properties.sender().notificationQueueUrl());
     }
 
     @Override
-    public Mono<String> sendMessageToAutomaticValidation(Object message) {
+    public Mono<Void> sendMessageToAutomaticValidation(Object message) {
         return sendToQueue(message, properties.sender().automaticValidationQueueUrl());
     }
 
-    private Mono<String> sendToQueue(Object message, String queueUrl) {
+    private Mono<Void> sendToQueue(Object message, String queueUrl) {
         return Mono.fromCallable(() -> {
                     String json = objectMapper.writeValueAsString(message);
                     return SendMessageRequest.builder()
@@ -41,7 +46,8 @@ public class SQSSender implements MessageQueueGateway {
                 })
                 .flatMap(request -> Mono.fromFuture(client.sendMessage(request)))
                 .doOnNext(response -> log.debug("Message sent to {} with id {}", queueUrl, response.messageId()))
-                .map(SendMessageResponse::messageId);
+                .then();
+
     }
 
 

@@ -12,16 +12,13 @@ services:
     container_name: petitions-app
     restart: on-failure
     ports:
-      - "8080:8080"
+      - "8081:8081"
     depends_on:
       - postgres
     environment:
       - SPRING_R2DBC_URL=r2dbc:postgresql://postgres:5432/petitions
       - SPRING_R2DBC_USERNAME=${ADAPTERS_R2DBC_USERNAME}
       - SPRING_R2DBC_PASSWORD=${ADAPTERS_R2DBC_PASSWORD}
-      - SPRING_FLYWAY_URL=jdbc:postgresql://postgres:5432/petitions
-      - SPRING_FLYWAY_USER=test
-      - SPRING_FLYWAY_PASSWORD=P@55w0rd
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_REGION=${AWS_REGION}
@@ -34,9 +31,9 @@ services:
     container_name: postgres-petitions
     restart: always
     environment:
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: P@55w0rd
-      POSTGRES_DB: petitions
+      POSTGRES_USER: ${ADAPTERS_R2DBC_USERNAME:test}
+      POSTGRES_PASSWORD: P${ADAPTERS_R2DBC_PASSWORD:P@55w0rd}
+      POSTGRES_DB: ${ADAPTERS_R2DBC_DATABASE:petitions}
     ports:
       - "5433:5432"
     volumes:

@@ -1,8 +1,11 @@
 package co.com.pragma.api.dto;
 
+import java.util.UUID;
+
 public record LoanTypeResponseDTO(
-        String id,
+        UUID id,
         String name,
-        Double interestRate
+        double interestRate,
+        boolean isAutomaticValidation
 ) {
 }

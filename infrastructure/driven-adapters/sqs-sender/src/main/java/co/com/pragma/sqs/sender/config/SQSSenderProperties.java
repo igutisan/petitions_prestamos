@@ -18,7 +18,7 @@ public record SQSSenderProperties(
     public record SenderProperties(
             String notificationQueueUrl,
             String automaticValidationQueueUrl,
-            String responseValidationQueueUrl
+            String acceptedPetitionsQueueUrl
     ) {
     }
 

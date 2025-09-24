@@ -86,6 +86,7 @@ public class PetitionUseCase {
                 .flatMap(updatedPetition -> petitionWithUserInfoRepository.findByIdWithUserInfo(updatedPetition.getId()))
                 .flatMap(petitionWithInfo -> {
                     PetitionStatusMessage message = new PetitionStatusMessage(
+                            petitionWithInfo.getId(),
                             petitionWithInfo.getUserName(),
                             petitionWithInfo.getLoanStatus().toString(),
                             petitionWithInfo.getUserEmail(),
@@ -95,8 +96,18 @@ public class PetitionUseCase {
 
                     );
 
-                    return messageQueueGateway.sendMessageToNotificationQueue(message)
+                    Mono<Void> acceptedQueueMono;
+
+                    if ("APPROVED".equalsIgnoreCase(petitionWithInfo.getLoanStatus().toString())) {
+                        acceptedQueueMono = messageQueueGateway.sendMessageToAcceptedPetitionsQueue(message);
+                    } else {
+                        acceptedQueueMono = Mono.empty();
+                    }
+
+                    return acceptedQueueMono
+                            .then(messageQueueGateway.sendMessageToNotificationQueue(message))
                             .thenReturn(petitionWithInfo);
+
                 });
     }
 

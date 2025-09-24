@@ -76,7 +76,6 @@ public class Handler {
                                 .collect(java.util.stream.Collectors.toMap(
                                         FieldError::getField,
                                         DefaultMessageSourceResolvable::getDefaultMessage));
-                        log.warn("Validation failed for petition DTO: {}", errorsMap);
                         return Mono.<CreatePetitionDTO>error(new ValidationException(
                                 "Error en la validación de los datos", errorsMap));
                     }
@@ -185,5 +184,3 @@ public class Handler {
 }
 
 
-//Hacer la HU5
-//Hacer la HU6

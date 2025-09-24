@@ -1,17 +1,31 @@
-FROM eclipse-temurin:21-jdk-alpine
-VOLUME /tmp
+FROM eclipse-temurin:21-jdk-alpine as builder
+WORKDIR /app
+# Copia el JAR generado por Gradle
+COPY applications/app-service/build/libs/*.jar app.jar
+# Extrae las capas para el cache de Docker
+RUN java -Djarmode=layertools -jar app.jar extract
 
-# Create a non-root user and group
+# --- Segunda Etapa: Imagen Final ---
+FROM eclipse-temurin:21-jdk-alpine
+WORKDIR /app
+
+# Crea un usuario y grupo no-root para mayor seguridad
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
-# Copy the application JAR from the build output directory
-# Make sure you have built the project with `./gradlew build` first
-COPY applications/app-service/build/libs/Petitions.jar Petitions.jar
+# Crea directorios necesarios y asigna permisos
+RUN mkdir /cache && \
+    chown -R appuser:appgroup /app && \
+    chown -R appuser:appgroup /cache
 
-# Set compatible JVM options for OpenJDK
-ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=70 -Djava.security.egd=file:/dev/./urandom"
-
-# Switch to the non-root user
+# Cambia al usuario no-root
 USER appuser
 
-ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -jar Petitions.jar" ]
+# Copia las capas extraídas desde la etapa builder
+# Estas capas se cachearán de forma independiente
+COPY --from=builder /app/dependencies/ ./ 
+COPY --from=builder /app/spring-boot-loader/ ./ 
+COPY --from=builder /app/snapshot-dependencies/ ./ 
+COPY --from=builder /app/application/ ./ 
+
+# Punto de entrada para ejecutar la aplicación
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=70", "org.springframework.boot.loader.launch.JarLauncher"]
